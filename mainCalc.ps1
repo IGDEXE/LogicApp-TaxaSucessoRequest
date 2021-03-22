@@ -2,10 +2,10 @@
 # Ivo Dias
 
 # Configuracoes
-$grupoRecursos = ""
-$nomeLogicApp = ""
-$AzSubscription = ""
-$limitepaginas = "200"
+$grupoRecursos = "" # Nome do Grupo de Recursos onde foi criado o App
+$nomeLogicApp = "" # Nome do Logic App conforme esta no Azure
+$AzSubscription = "" # ID da Subscricao no Azure
+$limitepaginas = "200" # Limite de paginas para serem analisadas (30 resultados por pagina)
 
 # Funcoes
 function Configurar-Modulo {
@@ -24,11 +24,11 @@ function Configurar-Modulo {
 }
 
 # Verificacoes iniciais
-Configurar-Modulo Az.LogicApp
+Configurar-Modulo Az.LogicApp # Faz a instalacao do modulo se necessario
 
 # Conectar ao Azure
-Connect-AzAccount
-Set-AzContext -Subscription "$AzSubscription"
+Connect-AzAccount # Conecta na conta (vai aparecer um prompt para entrar)
+#Set-AzContext -Subscription "$AzSubscription" # Seleciona a subscricao (deixe comentado, pois nem sempre tem mais de uma na conta)
 
 # Calcula a quantidade de retornos analisados
 [int]$limitepaginas += 1
@@ -36,13 +36,13 @@ Set-AzContext -Subscription "$AzSubscription"
 
 # Recebe o total de requests
 $totalRun = Get-AzLogicAppRunHistory -ResourceGroupName "$grupoRecursos" -Name "$nomeLogicApp"  -FollowNextPageLink -MaximumFollowNextPageLink $limitepaginas
-[int]$Run = $totalRun.count
+[int]$Run = $totalRun.count # Calcula a quantidade de retornos
 
 # Recebe o total das falhas
-$totalFalhas = $totalRun | Where-Object {$_.Status -eq "Failed"}
-[int]$Fail = $totalFalhas.count
+$totalFalhas = $totalRun | Where-Object {$_.Status -eq "Failed"} # Filtra os que falharam com base no status
+[int]$Fail = $totalFalhas.count # Calcula a quantidade de retornos
 
-# Calcula taxa
+# Calcula taxa em %
 [Float]$taxa = ($fail*100)/$run
 $taxa = [math]::Round($taxa,2)
 
